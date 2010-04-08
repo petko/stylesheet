@@ -30,36 +30,47 @@ namespace StyleSheet {
 class CssProperty
 {
 public:
-    CssProperty(const std::string& name, const std::string& value)
-            : name_(name), value_(value)
-    {}
-    // static ctor
-    static CssProperty parse(const std::string& str)
-    {
-        std::size_t pos = str.find(':');
-        if (pos == std::string::npos)
-            throw std::invalid_argument("value not found");
-        if ((pos + 1) == str.size())
-            throw std::invalid_argument("value not found");
-        std::string name = str.substr(0, pos);
-        boost::algorithm::trim(name);
+  static const CssProperty& Empty() {
+    static CssProperty emptyProperty("", ""); return emptyProperty;
+  }
 
-        std::size_t lastPos = str.find(';');
-        std::string value = lastPos == std::string::npos ? str.substr(pos + 1) : str.substr(pos + 1, lastPos - pos - 1);
-        boost::algorithm::trim(value);
-        return CssProperty(name, value);
-    }
+  CssProperty(const std::string& name, const std::string& value)
+          : name_(name), value_(value)
+  {
+    // TODO: check name and value validity
+  }
 
-    bool operator<(const CssProperty& p) const { return name_ < p.name_; }
+  // static ctor
+  static CssProperty parse(const std::string& str)
+  {
+    std::size_t pos = str.find(':');
+    if (pos == std::string::npos)
+      throw std::invalid_argument("value not found");
+    if ((pos + 1) == str.size())
+      throw std::invalid_argument("value not found");
+    std::string name = str.substr(0, pos);
+    boost::algorithm::trim(name);
 
-    const std::string& getName() const { return name_; }
-    const std::string& getValue() const { return value_; }
+    std::size_t lastPos = str.find(';');
+    std::string value = lastPos == std::string::npos ? str.substr(pos + 1) : str.substr(pos + 1, lastPos - pos - 1);
+    boost::algorithm::trim(value);
+    return CssProperty(name, value);
+  }
 
-    std::string toString() const { return name_ + ": " + value_ + ";"; }
+  bool operator<(const CssProperty& p) const {
+    return name_ < p.name_/* || (name_ == p.name_ && value_ < p.value_)*/;
+  }
+
+  const std::string& getName() const { return name_; }
+  const std::string& getValue() const { return value_; }
+
+  bool isValid() const { return !name_.empty(); }
+
+  std::string toString() const { return name_ + ": " + value_ + ";"; }
 
 private:
-    std::string name_;
-    std::string value_;
+  std::string name_;
+  std::string value_;
 };
 
 } // namespace StyleSheet
