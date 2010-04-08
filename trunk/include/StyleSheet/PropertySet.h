@@ -63,11 +63,11 @@ public:
 	std::size_t size() const { return properties_.size(); }
 	bool empty() const { return properties_.empty(); }
 
-	CssProperty getProperty(const std::string& name) const
+	const CssProperty& getProperty(const std::string& name) const
 	{
 		PropertySet::const_iterator it = std::find_if(properties_.begin(), properties_.end(), PropertyFinder(name));
 		if (it == properties_.end())
-			return CssProperty("", "");
+			return CssProperty::Empty();
 		return *it;
 	}
 
